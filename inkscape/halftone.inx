@@ -10,6 +10,7 @@
   </param>
   <param name="target_w" type="int"  min="300" max="100000" _gui-text="Target width of image">500</param>
   <param name="max_r" type="float" _gui-text="Maximum raduis of holes">3</param>
+  <param name="offset" type="boolean" _gui-text="Offset odd and even holes">1</param>
   <param name="fill" type="color" _gui-text="Fill">000000ff</param>
   <effect>
     <object-type>bitmap</object-type>
