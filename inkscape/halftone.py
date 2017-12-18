@@ -8,6 +8,8 @@ from skimage.util import invert
 inkex.localize()
 _ = gettext.gettext
 
+__version__ = '1.0.0'
+
 
 class HalfToneEffect(inkex.Effect):
     def __init__(self):
