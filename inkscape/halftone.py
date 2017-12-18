@@ -1,4 +1,4 @@
-import sys
+import os
 import inkex
 import gettext
 from skimage.io import imread
@@ -66,48 +66,62 @@ width of image'
         # Get access to main SVG document element and get its dimensions.
         svg = self.document.getroot()
 
-        # Create a new layer.
-        layer = inkex.etree.SubElement(svg, 'g')
-        layer.set(inkex.addNS('label', 'inkscape'), 'halftone')
-        layer.set(inkex.addNS('groupmode', 'inkscape'), 'layer')
-
-        #self.getselected()
+        self.getselected()
         if self.selected:
+
             image = None
             for index in self.selected.keys():
+
+                # Get path to image (hacky galore)
                 for k, v in self.selected[index].items():
                     if k.endswith('ref'):
                         image = v
                         break
 
-                if image is None:
-                    inkex.errormsg(_("Please select a bitmap image"))
-                    return
+                # Create a new layer.
+                layername = '{layer}'.format(layer=os.path.basename(image))
+                layer = inkex.etree.SubElement(svg, 'g')
+                layer.set(inkex.addNS('label', 'inkscape'), layername)
+                layer.set(inkex.addNS('groupmode', 'inkscape'), 'layer')
 
+                # Convert selected image to an inverted grayscale ndarray
                 org_src = rgb2gray(invert(imread(image)))
+
+                # Original image dimensions
                 h, w = org_src.shape
 
+                # Calculate scale factor
                 scale = self.options.target_w / float(w)
+
+                # get highest "color" value of image to determine range
                 img_max = org_src.max()
+
+                # Calculate size of each seacrh
                 tile_w = self.options.max_r * 2
 
+                # Iterate over rows
                 for ty in xrange(0, h, int(tile_w // scale) + 1):
+
+                    # Offset odd rows if offset checkbox is set
                     offset = 0
                     if self.options.offset == 'true' and ty % 2:
                         offset = int(tile_w // scale) // 2
 
+                    # Iterate over columns
                     for tx in xrange(offset, w, int(tile_w // scale) + 1):
-                        # Calculate size of dot
+                        # Get average average value of tile
                         avg = org_src[ty:ty + int(tile_w),
                                       tx:tx + int(tile_w)
                                       ].mean()
 
+                        # Calculate size of dot
                         dot_r = self.scale_r(avg, img_max)
 
                         # calculate x, y corrdinates
                         x = ((tx + tile_w) - tile_w // 2) * scale
                         y = ((ty + tile_w) - tile_w // 2) * scale
 
+                        # Circle attributes
                         circ_attribs = {
                             'cx': str(x) + self.options.units,
                             'cy': str(y) + self.options.units,
@@ -117,6 +131,7 @@ width of image'
                             'fill': self.options.fill
                             }
 
+                        # Draw circle
                         inkex.etree.SubElement(layer,
                                                inkex.addNS('circle', 'svg'),
                                                circ_attribs
