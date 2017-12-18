@@ -1,3 +1,4 @@
+import sys
 import inkex
 import gettext
 from skimage.io import imread
@@ -11,11 +12,6 @@ _ = gettext.gettext
 class HalfToneEffect(inkex.Effect):
     def __init__(self):
         inkex.Effect.__init__(self)
-
-        self.target_w = 500
-        self.max_r = 3
-        self.fill = '000000ff'
-        self.units = 'mm'
 
         self.OptionParser.add_option('-r',
                                      '--max_r',
@@ -35,6 +31,14 @@ class HalfToneEffect(inkex.Effect):
                                      help='Fill color'
                                      )
 
+        self.OptionParser.add_option('-o',
+                                     '--offset',
+                                     action='store',
+                                     dest='offset',
+                                     default=1,
+                                     help='Offset odd and even holes'
+                                     )
+
         self.OptionParser.add_option('-u',
                                      '--units',
                                      action='store',
@@ -42,7 +46,8 @@ class HalfToneEffect(inkex.Effect):
                                      choices=['mm', 'in'],
                                      dest='units',
                                      default='mm',
-                                     help='Fill color'
+                                     help='Units to determine size of holes and\
+width of image'
                                      )
 
         self.OptionParser.add_option('-w',
@@ -51,7 +56,7 @@ class HalfToneEffect(inkex.Effect):
                                      type='int',
                                      dest='target_w',
                                      default=500,
-                                     help='Target width in mm'
+                                     help='Target width'
                                      )
 
     def scale_r(self, value, max_v):
@@ -87,7 +92,11 @@ class HalfToneEffect(inkex.Effect):
                 tile_w = self.options.max_r * 2
 
                 for ty in xrange(0, h, int(tile_w // scale) + 1):
-                    for tx in xrange(0, w, int(tile_w // scale) + 1):
+                    offset = 0
+                    if self.options.offset == 'true' and ty % 2:
+                        offset = int(tile_w // scale) // 2
+
+                    for tx in xrange(offset, w, int(tile_w // scale) + 1):
                         # Calculate size of dot
                         avg = org_src[ty:ty + int(tile_w),
                                       tx:tx + int(tile_w)
