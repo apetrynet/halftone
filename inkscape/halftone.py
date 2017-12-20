@@ -37,7 +37,7 @@ class HalfToneEffect(inkex.Effect):
                                      '--offset',
                                      action='store',
                                      dest='offset',
-                                     default=1,
+                                     default='true',
                                      help='Offset odd and even holes'
                                      )
 
@@ -102,11 +102,11 @@ width of image'
                 tile_w = self.options.max_r * 2
 
                 # Iterate over rows
-                for ty in xrange(0, h, int(tile_w // scale) + 1):
+                for row, ty in enumerate(xrange(0, h, int(tile_w // scale) + 1)):
 
                     # Offset odd rows if offset checkbox is set
                     offset = 0
-                    if self.options.offset == 'true' and ty % 2:
+                    if self.options.offset == 'true' and row % 2:
                         offset = int(tile_w // scale) // 2
 
                     # Iterate over columns
