@@ -86,6 +86,11 @@ width of image'
                 layer.set(inkex.addNS('label', 'inkscape'), layername)
                 layer.set(inkex.addNS('groupmode', 'inkscape'), 'layer')
 
+                # Create a group to hold image
+                grp_name = '{layer}_halftone'.format(layer=layername)
+                grp_attribs = {inkex.addNS('label', 'inkscape'): grp_name}
+                grp = inkex.etree.SubElement(layer, 'g', grp_attribs)
+
                 # Convert selected image to an inverted grayscale ndarray
                 org_src = rgb2gray(invert(imread(image)))
 
@@ -102,7 +107,8 @@ width of image'
                 tile_w = self.options.max_r * 2
 
                 # Iterate over rows
-                for row, ty in enumerate(xrange(0, h, int(tile_w // scale) + 1)):
+                iterator = xrange(0, h, int(tile_w // scale) + 1)
+                for row, ty in enumerate(iterator):
 
                     # Offset odd rows if offset checkbox is set
                     offset = 0
@@ -134,7 +140,7 @@ width of image'
                             }
 
                         # Draw circle
-                        inkex.etree.SubElement(layer,
+                        inkex.etree.SubElement(grp,
                                                inkex.addNS('circle', 'svg'),
                                                circ_attribs
                                                )
