@@ -130,20 +130,26 @@ width of image'
                         y = ((ty + tile_w) - tile_w // 2) * scale
 
                         # Circle attributes
-                        circ_attribs = {
-                            'cx': str(x) + self.options.units,
-                            'cy': str(y) + self.options.units,
-                            'r': str(dot_r) + self.options.units,
-                            inkex.addNS('label', 'inkscape'): 'dot',
-                            'stroke': 'none',
-                            'fill': self.options.fill
+                        units = self.options.units
+                        attribs = {
+                            'stroke': self.options.fill,
+                            inkex.addNS('cx', 'sodipodi'): str(x) + units,
+                            inkex.addNS('cy', 'sodipodi'): str(y) + units,
+                            inkex.addNS('rx', 'sodipodi'): str(dot_r) + units,
+                            inkex.addNS('ry', 'sodipodi'): str(dot_r) + units,
+                            inkex.addNS('start', 'sodipodi'): str(0),
+                            inkex.addNS('end', 'sodipodi'): str(2 * inkex.pi),
+                            inkex.addNS('open', 'sodipodi'): 'false',
+                            inkex.addNS('type', 'sodipodi'): 'arc',
+                            'transform': ''
                             }
 
                         # Draw circle
                         inkex.etree.SubElement(grp,
-                                               inkex.addNS('circle', 'svg'),
-                                               circ_attribs
+                                               inkex.addNS('path', 'svg'),
+                                               attribs
                                                )
+
 
 # Create effect instance and apply it.
 effect = HalfToneEffect()
