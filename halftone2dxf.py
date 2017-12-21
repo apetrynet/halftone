@@ -1,41 +1,103 @@
+#!/usr/bin/python
+
 import sys
-import numpy as np
-from time import time
-from skimage.io import imread, imsave
+import argparse
+from skimage.io import imread
 from skimage.color import rgb2gray
 from skimage.util import invert
-from skimage.draw import circle
-
 from dxfwrite import DXFEngine as dxf
 
-#image = sys.argv[1]
+
+__version__ = '1.0.0'
 
 
-def timeit(method):
+def parse_args():
+    unicodize = lambda s: unicode(s, 'utf-8')
 
-    def timed(*args, **kw):
-        ts = time()
-        result = method(*args, **kw)
-        te = time()
+    description = 'Create a halftone DXF from bitmap image'
+    prog = 'halftone2dxf'
 
-        print 'func: %s, %2.2f sec' % (method.__name__, te - ts)
-        return result
+    parser = argparse.ArgumentParser(prog=prog, description=description)
+    parser.add_argument(
+                '--version',
+                action='version',
+                version='%(prog)s' + __version__
+                )
 
-    return timed
+    parser.add_argument(
+                '-s',
+                '--source',
+                dest='source',
+                action='store',
+                type=unicodize,
+                default=None,
+                help='Path to source file',
+                required=True
+                )
+
+    parser.add_argument(
+                '-w',
+                '--target-width',
+                dest='target_width',
+                action='store',
+                type=int,
+                default=200,
+                help='Target width in mm',
+                metavar=200
+                )
+
+    parser.add_argument(
+                '-r',
+                '--max-radius',
+                dest='max_radius',
+                action='store',
+                type=float,
+                default=3.,
+                help='Max radius of holes',
+                metavar=3.
+                )
+
+    parser.add_argument(
+                '--offset',
+                dest='offset',
+                action='store_true',
+                default=True,
+                help='Offset odd and even rows'
+                )
+
+    parser.add_argument(
+                '-o',
+                '--output',
+                dest='output',
+                action='store',
+                type=unicodize,
+                default=None,
+                help='Path to save file'
+                )
+
+    # Display help if no arguments are provided
+    if len(sys.argv) == 1:
+        sys.exit(parser.print_help())
+
+    args = parser.parse_args()
+
+    return args
 
 
-#@timeit
-def scale_r(value, max_v):
+def make_dxf(source=None, target_width=200, max_radius=3., offset=True):
 
-    return (value / max_v) * float(max_r)
+    def scale_r(value, max_v):
+        return (value / max_v) * float(max_radius)
 
+    src = rgb2gray(invert(imread(source)))
+    dwg = dxf.drawing()
+    dwg.add_layer('dots')
 
-@timeit
-def scan_image(src, dest, offset=True):
     h, w = src.shape
     img_max = src.max()
+    tile_w = max_radius * 2
+    scale = target_width / float(w)
 
-    dots = []
     for row, ty in enumerate(xrange(0, h, int(tile_w // scale) + 1)):
         offset_x = 0
         if offset and row % 2:
@@ -50,46 +112,27 @@ def scan_image(src, dest, offset=True):
             x = ((tx + tile_w) - tile_w // 2) * scale
             y = ((ty + tile_w) - tile_w // 2) * scale
 
-            # place dot in dest array
-            #rr, cc = circle(y, x, dot_r)
-            #dest[rr, cc] = (255, 0, 0)
-
             c = dxf.circle(radius=dot_r,
                            center=(x, (y * -1) + h * scale),
                            color=1,
                            layer='dots'
                            )
-            dest.add(c)
-            dots.append(dot_r)
+            dwg.add(c)
 
-    print max(dots)
-
-image = 'images/saxophone.jpg'
-image = 'images/rockwool.jpg'
-image = 'images/maxresdefault.jpg'
-image = 'images/biggie.jpeg'
-image = 'images/biggie.png'
-image = 'images/audry.jpg'
-image = 'images/gang-starr-5092b57751d1c.jpg'
-image = 'images/magnus_petterson_0.jpg'
-src = rgb2gray(invert(imread(image)))
-h, w = src.shape
-
-max_r = 1.25
-tile_w = max_r * 2
+    return dwg
 
 
-target_w = 150
-#target_h = 500
+if __name__ == '__main__':
+    opts = parse_args()
 
-scale = target_w / float(w)
-print h * scale
-dwg = dxf.drawing('result.dxf')
-dwg.add_layer('dots')
-scan_image(src, dwg)
-dwg.save()
+    dwg = make_dxf(source=opts.source,
+                   target_width=opts.target_width,
+                   max_radius=opts.max_radius,
+                   offset=opts.offset
+                   )
 
-#h, w = src.shape
-#dest = np.zeros((h, w, 3), dtype=np.uint8)
-#scan_image(src, dest)
-#imsave('/local/dot.png', dest)
+    output = opts.output
+    if output is None:
+        output = '.'.join(opts.source.rsplit('.', 1)[:1] + ['dxf'])
+
+    dwg.saveas(output)
