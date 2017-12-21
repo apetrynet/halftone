@@ -1,14 +1,16 @@
 # Inkscape extension
 Add files to inkscapes extensions folder. Please follow instructions on inkscape website.
+
 Dependencies:
-    * [skimage](http://scikit-image.org/)
+* [skimage](http://scikit-image.org/)
 
 
 # image2halftoneDXF.py
 Command line tool for converting images to halftone DXF for laser cutting or CNC milling etc.
+
 Dependencies:
-    * [dxfwrite](http://pythonhosted.org/dxfwrite/index.html)
-    * [skimage](http://scikit-image.org/)
+* [dxfwrite](http://pythonhosted.org/dxfwrite/index.html)
+* [skimage](http://scikit-image.org/)
 
 
 ```shell
