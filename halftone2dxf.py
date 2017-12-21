@@ -31,15 +31,19 @@ def scale_r(value, max_v):
 
 
 @timeit
-def scan_image(src, dest):
+def scan_image(src, dest, offset=True):
     h, w = src.shape
     img_max = src.max()
 
     dots = []
-    for ty in range(0, h, int(tile_w // scale) + 1):
-        for tx in range(0, w, int(tile_w // scale) + 1):
+    for row, ty in enumerate(xrange(0, h, int(tile_w // scale) + 1)):
+        offset_x = 0
+        if offset and row % 2:
+            offset_x = int(tile_w // scale) // 2
+
+        for tx in xrange(offset_x, w, int(tile_w // scale) + 1):
             # Calculate size of dot
-            avg = src[ty:ty + tile_w, tx:tx + tile_w].mean()
+            avg = src[ty:ty + int(tile_w), tx:tx + int(tile_w)].mean()
             dot_r = scale_r(avg, img_max)
 
             # calculate x, y corrdinates
@@ -66,14 +70,16 @@ image = 'images/maxresdefault.jpg'
 image = 'images/biggie.jpeg'
 image = 'images/biggie.png'
 image = 'images/audry.jpg'
+image = 'images/gang-starr-5092b57751d1c.jpg'
+image = 'images/magnus_petterson_0.jpg'
 src = rgb2gray(invert(imread(image)))
 h, w = src.shape
 
-max_r = 3
+max_r = 1.25
 tile_w = max_r * 2
 
 
-target_w = 575
+target_w = 150
 #target_h = 500
 
 scale = target_w / float(w)
