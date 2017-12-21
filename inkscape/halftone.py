@@ -139,7 +139,7 @@ width of image'
                             inkex.addNS('ry', 'sodipodi'): str(dot_r) + units,
                             inkex.addNS('start', 'sodipodi'): str(0),
                             inkex.addNS('end', 'sodipodi'): str(2 * inkex.pi),
-                            inkex.addNS('open', 'sodipodi'): 'false',
+                            inkex.addNS('open', 'sodipodi'): 'true',
                             inkex.addNS('type', 'sodipodi'): 'arc',
                             'transform': ''
                             }
