@@ -1,2 +1,26 @@
-# halftone
-Halftone library and set of plugins/extensions
+# Inkscape extension
+Add files to inkscapes extensions folder. Please follow instructions on inkscape website.
+
+
+# image2halftoneDXF.py
+Command line tool for converting images to halftone DXF for laser cutting or CNC milling etc.
+
+```shell
+usage: image2halftoneDXF [-h] [--version] -s SOURCE [-w 200] [-r 3.0]
+                         [--offset] [-o OUTPUT]
+
+Create a halftone DXF from image (worst name tool ever :)
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  -s SOURCE, --source SOURCE
+                        Path to source file
+  -w 200, --target-width 200
+                        Target width in mm
+  -r 3.0, --max-radius 3.0
+                        Max radius of holes
+  --offset              Offset odd and even rows
+  -o OUTPUT, --output OUTPUT
+                        Path to save file
+```
