@@ -47,7 +47,16 @@ def parse_args():
                 )
 
     parser.add_argument(
-                '-r',
+                '--min-radius',
+                dest='min_radius',
+                action='store',
+                type=float,
+                default=1.5,
+                help='Min radius of holes',
+                metavar=1.5
+                )
+
+    parser.add_argument(
                 '--max-radius',
                 dest='max_radius',
                 action='store',
@@ -84,10 +93,15 @@ def parse_args():
     return args
 
 
-def make_dxf(source=None, target_width=200, max_radius=3., offset=True):
+def make_dxf(source=None,
+             target_width=200,
+             min_radius=1.5,
+             max_radius=4.,
+             offset=True
+             ):
 
-    def scale_r(value, max_v):
-        return (value / max_v) * float(max_radius)
+    def scale_r(value, min_v, max_v, min_r, max_r):
+        return (value - min_v) * (max_r - min_r) / (max_v - min_v) + min_r
 
     src = rgb2gray(invert(imread(source)))
     dwg = dxf.drawing()
@@ -95,6 +109,7 @@ def make_dxf(source=None, target_width=200, max_radius=3., offset=True):
 
     h, w = src.shape
     img_max = src.max()
+    img_min = src.min()
     tile_w = max_radius * 2
     scale = target_width / float(w)
 
@@ -106,7 +121,7 @@ def make_dxf(source=None, target_width=200, max_radius=3., offset=True):
         for tx in xrange(offset_x, w, int(tile_w // scale) + 1):
             # Calculate size of dot
             avg = src[ty:ty + int(tile_w), tx:tx + int(tile_w)].mean()
-            dot_r = scale_r(avg, img_max)
+            dot_r = scale_r(avg, img_min, img_max, min_radius, max_radius)
 
             # calculate x, y corrdinates
             x = ((tx + tile_w) - tile_w // 2) * scale
@@ -127,6 +142,7 @@ if __name__ == '__main__':
 
     dwg = make_dxf(source=opts.source,
                    target_width=opts.target_width,
+                   min_radius=opts.min_radius,
                    max_radius=opts.max_radius,
                    offset=opts.offset
                    )
