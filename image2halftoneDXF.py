@@ -8,7 +8,7 @@ from skimage.util import invert
 from dxfwrite import DXFEngine as dxf
 
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 
 def parse_args():
@@ -51,9 +51,9 @@ def parse_args():
                 dest='min_radius',
                 action='store',
                 type=float,
-                default=1.5,
+                default=0.,
                 help='Min radius of holes',
-                metavar=1.5
+                metavar=0.
                 )
 
     parser.add_argument(
@@ -95,8 +95,8 @@ def parse_args():
 
 def make_dxf(source=None,
              target_width=200,
-             min_radius=1.5,
-             max_radius=4.,
+             min_radius=0.,
+             max_radius=3.,
              offset=True
              ):
 
