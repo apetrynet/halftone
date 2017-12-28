@@ -14,8 +14,9 @@ Dependencies:
 
 
 ```shell
-usage: image2halftoneDXF [-h] [--version] -s SOURCE [-w 200] [-r 3.0]
-                         [--offset] [-o OUTPUT]
+usage: image2halftoneDXF [-h] [--version] -s SOURCE [-w 200]
+                         [--min-radius 0.0] [--max-radius 3.0] [--offset]
+                         [-o OUTPUT]
 
 Create a halftone DXF from image (worst name tool ever :)
 
@@ -26,8 +27,8 @@ optional arguments:
                         Path to source file
   -w 200, --target-width 200
                         Target width in mm
-  -r 3.0, --max-radius 3.0
-                        Max radius of holes
+  --min-radius 0.0      Min radius of holes
+  --max-radius 3.0      Max radius of holes
   --offset              Offset odd and even rows
   -o OUTPUT, --output OUTPUT
                         Path to save file
