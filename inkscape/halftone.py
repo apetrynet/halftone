@@ -8,19 +8,26 @@ from skimage.util import invert
 inkex.localize()
 _ = gettext.gettext
 
-__version__ = '1.0.0'
+__version__ = '1.1.0'
 
 
 class HalfToneEffect(inkex.Effect):
     def __init__(self):
         inkex.Effect.__init__(self)
 
-        self.OptionParser.add_option('-r',
-                                     '--max_r',
+        self.OptionParser.add_option('--min_r',
+                                     action='store',
+                                     type='float',
+                                     dest='min_r',
+                                     default=0.,
+                                     help='Maximum radios of holes'
+                                     )
+
+        self.OptionParser.add_option('--max_r',
                                      action='store',
                                      type='float',
                                      dest='max_r',
-                                     default=3,
+                                     default=3.,
                                      help='Maximum radios of holes'
                                      )
 
@@ -61,8 +68,8 @@ width of image'
                                      help='Target width'
                                      )
 
-    def scale_r(self, value, max_v):
-        return (value / max_v) * float(self.options.max_r)
+    def scale_r(self, value, min_v, max_v, min_r, max_r):
+        return (value - min_v) * (max_r - min_r) / (max_v - min_v) + min_r
 
     def effect(self):
         # Get access to main SVG document element and get its dimensions.
@@ -101,6 +108,7 @@ width of image'
                 scale = self.options.target_w / float(w)
 
                 # get highest "color" value of image to determine range
+                img_min = org_src.min()
                 img_max = org_src.max()
 
                 # Calculate size of each seacrh
@@ -123,7 +131,12 @@ width of image'
                                       ].mean()
 
                         # Calculate size of dot
-                        dot_r = self.scale_r(avg, img_max)
+                        dot_r = self.scale_r(avg,
+                                             img_min,
+                                             img_max,
+                                             float(self.options.min_r),
+                                             float(self.options.max_r)
+                                             )
 
                         # calculate x, y corrdinates
                         x = ((tx + tile_w) - tile_w // 2) * scale
