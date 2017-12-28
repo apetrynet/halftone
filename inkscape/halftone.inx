@@ -9,7 +9,8 @@
       <item value="in">in</item>
   </param>
   <param name="target_w" type="int"  min="100" max="10000" _gui-text="Target width of image">300</param>
-  <param name="max_r" type="float" _gui-text="Maximum raduis of holes">3</param>
+  <param name="min_r" type="float" _gui-text="Minimum raduis of holes">0.</param>
+  <param name="max_r" type="float" _gui-text="Maximum raduis of holes">3.</param>
   <param name="offset" type="boolean" _gui-text="Offset odd and even holes">true</param>
   <param name="fill" type="color" _gui-text="Fill">000000ff</param>
   <effect>
