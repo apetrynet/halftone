@@ -14,7 +14,7 @@ __version__ = '1.1.0'
 def parse_args():
     unicodize = lambda s: unicode(s, 'utf-8')
 
-    description = 'Create a halftone DXF from image (worst name tool ever :)'
+    description = 'Create a halftone DXF from image (worst named tool ever :)'
     prog = 'image2halftoneDXF'
 
     parser = argparse.ArgumentParser(prog=prog, description=description)
